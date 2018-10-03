@@ -1,5 +1,6 @@
 #aligns the fastq files to a reference genome
 module load BWA/0.7.17-foss-2016b
+bwa index /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta
 bwa mem -M -t 16 /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta /lustre1/gwc32007/crypto_fastq_files/UKP4/SRR6147581_1.fastq.gz /lustre1/gwc32007/crypto_fastq_files/UKP4/SRR6147581_2.fastq.gz > UKP4_aln.sam
 
 #converts the .sam file to a more condensed .bam file
