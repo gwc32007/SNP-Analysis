@@ -71,3 +71,17 @@ cd $PBS_O_WORKDIR
 module load picard/2.16.0-Java-1.8.0_144
 time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar CreateSequenceDictionary R=/lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta O=/lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIf
 ullgenome.fasta.dict
+
+#find SNP calls in the alignments
+
+#PBS -S /bin/bash
+#PBS -N j_gatk
+#PBS -q batch
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=48:00:00
+#PBS -l mem=2gb
+
+module load GATK/3.8-0-Java-1.8.0_144
+
+java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta -I /lustre1/gwc32007/fastq_alignments/UKP3_aln.dupl.read.sort.bam -o /lustre1/gwc32007/fastq_alignments/UKP3_output.g.v
+cf.gz -ERC GVCF
