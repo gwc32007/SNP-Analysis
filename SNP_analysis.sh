@@ -22,7 +22,7 @@ time bwa index /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta
 cd $PBS_O_WORKDIR
 
 module load BWA/0.7.17-foss-2016b
-time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta /scratch/gwc32007/crypto_fastq/TU502/SRR1183950_1.fastq.gz /scratch/gwc32007/crypto_fastq/TU502/SRR1183950_2.fastq.gz > /scratch/gwc32007/fastq_alignments/TU502_aln.sam
+time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta /scratch/gwc32007/crypto_fastq/TU502_2012/SRR1015747_1.fastq /scratch/gwc32007/crypto_fastq/TU502_2012/SRR1015747_2.fastq > /scratch/gwc32007/fastq_alignments/TU502_2012_aln.sam
 
 #converts the .sam file to a more condensed .bam file
 
@@ -36,7 +36,7 @@ time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fas
 cd $PBS_O_WORKDIR
 
 module load SAMtools/1.6-foss-2016b
-time samtools view -bt /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -o /scratch/gwc32007/fastq_alignments/TU502_aln.bam /scratch/gwc32007/fastq_alignments/TU502_aln.sam
+time samtools view -bt /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -o /scratch/gwc32007/fastq_alignments/TU502_2012_aln.bam /scratch/gwc32007/fastq_alignments/TU502_2012_aln.sam
 
 #sorts the alignments from smallest to largest
 
@@ -51,7 +51,7 @@ cd $PBS_O_WORKDIR
 
 module load SAMtools/1.6-foss-2016b
 
-time samtools sort /scratch/gwc32007/fastq_alignments/TU502_aln.bam -o /scratch/gwc32007/fastq_alignments/TU502_aln.sorted.bam
+time samtools sort /scratch/gwc32007/fastq_alignments/TU502_2012_aln.bam -o /scratch/gwc32007/fastq_alignments/TU502_2012_aln.sorted.bam
 
 #marks the duplicate reads in the alignment
 
@@ -65,8 +65,8 @@ time samtools sort /scratch/gwc32007/fastq_alignments/TU502_aln.bam -o /scratch/
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar MarkDuplicates I=/scratch/gwc32007/fastq_alignments/TU502_aln.sorted.bam O=/scratch/gwc32007/fastq_alignments/TU502_aln.sorted_duplicates.bam M=mar
-ked_dup_metrics.txt REMOVE_DUPLICATES=false
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar MarkDuplicates I=/scratch/gwc32007/fastq_alignments/TU502_2012_aln.sorted.bam O=/scratch/gwc32007/fastq_alignments/TU502_2012_aln.sorted_duplicates
+.bam M=marked_dup_metrics.txt REMOVE_DUPLICATES=false
 
 #replaces read groups in the bam file with one read group
 
@@ -80,8 +80,8 @@ ked_dup_metrics.txt REMOVE_DUPLICATES=false
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar AddOrReplaceReadGroups I=/scratch/gwc32007/fastq_alignments/TU502_aln.sorted_duplicates.bam O=/scratch/gwc32007/fastq_alignments/TU502_aln.dupl.rea
-d.sort.bam SORT_ORDER=coordinate RGLB=lib1 RGPL=illumina RGSM=20 RGPU=unit1 VALIDATION_STRINGENCY=LENIENT 
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar AddOrReplaceReadGroups I=/scratch/gwc32007/fastq_alignments/TU502_2012_aln.sorted_duplicates.bam O=/scratch/gwc32007/fastq_alignments/TU502_2012_al
+n.dupl.read.sort.bam SORT_ORDER=coordinate RGLB=lib1 RGPL=illumina RGSM=20 RGPU=unit1 VALIDATION_STRINGENCY=LENIENT 
 
 #indexing the reference
 
@@ -98,7 +98,7 @@ module load SAMtools/1.6-foss-2016b
 
 time samtools faidx /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta
 
-time samtools index /scratch/gwc32007/fastq_alignments/TU502_aln.dupl.read.sort.bam
+time samtools index /scratch/gwc32007/fastq_alignments/TU502_2012_aln.dupl.read.sort.bam
 
 #creating dictionary for reference
 
@@ -127,5 +127,5 @@ sta.dict
 
 module load GATK/3.8-0-Java-1.8.0_144
 
-java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -I /scratch/gwc32007/fastq_alignments/TU502_aln.dupl.read.sort.bam -o /scratch/gwc32007/SNPGenie/gvcf_CURO/TU502_output.g.vcf
-.gz -ERC GVCF
+java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -I /scratch/gwc32007/fastq_alignments/TU502_2012_aln.dupl.read.sort.bam -o /scratch/gwc32007/SNPGenie/gvcf_CURO/TU502_2012_ou
+tput.g.vcf.gz -ERC GVCF
