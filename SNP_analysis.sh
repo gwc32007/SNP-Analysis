@@ -129,3 +129,4 @@ module load GATK/3.8-0-Java-1.8.0_144
 
 java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -I /scratch/gwc32007/fastq_alignments/UKH5_aln.dupl.read.sort.bam -o /scratch/gwc32007/SNPGenie/gvcf_CURO/UKH5_output.g.vcf.g
 z -ERC GVCF
+
