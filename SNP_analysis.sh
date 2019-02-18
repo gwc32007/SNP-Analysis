@@ -1,14 +1,57 @@
-#aligns the fastq files to a reference genome
+#indexes reference genome
+
+#PBS -S /bin/bash
+#PBS -N j_bwa
+#PBS -l walltime=128:00:00
+#PBS -l nodes=1:ppn=1:AMD
+#PBS -q batch
+
+cd $PBS_O_WORKDIR
+
 module load BWA/0.7.17-foss-2016b
-bwa index /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta
-bwa mem -M -t 16 /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta /lustre1/gwc32007/crypto_fastq_files/UKP4/SRR6147581_1.fastq.gz /lustre1/gwc32007/crypto_fastq_files/UKP4/SRR6147581_2.fastq.gz > UKP4_aln.sam
+time bwa index /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta
+
+#aligns reads to reference genome
+
+#PBS -S /bin/bash
+#PBS -N j_bwa
+#PBS -l walltime=128:00:00
+#PBS -l nodes=1:ppn=1:AMD
+#PBS -q batch
+
+cd $PBS_O_WORKDIR
+
+module load BWA/0.7.17-foss-2016b
+time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta /scratch/gwc32007/crypto_fastq/UKP2/fastq#1 /scratch/gwc32007/crypto_fastq/UKP2/fastq#2 > /scratch/gwc32007/fastq_alignments/UKP2_aln.sam
 
 #converts the .sam file to a more condensed .bam file
+
+#PBS -S /bin/bash
+#PBS -N j_s_samtools
+#PBS -q batch
+#PBS -l nodes=1:ppn=1:AMD
+#PBS -l mem=100gb
+#PBS -l walltime=480:00:00
+
+cd $PBS_O_WORKDIR
+
 module load SAMtools/1.6-foss-2016b
-samtools view -bt ~/crypto_fastq_files/crypto_iowaIIfullgenome.fasta -o UKP3_aln.bam ~/fastq_alignments/UKP3_aln.sam
+time samtools view -bt /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -o /scratch/gwc32007/fastq_alignments/UKP2_aln.bam /scratch/gwc32007/fastq_alignments/UKP2_aln.sam
 
 #sorts the alignments from smallest to largest
-samtools sort /lustre1/gwc32007/fastq_alignments/UKP3_aln.bam -o /lustre1/gwc32007/fastq_alignments/UKP3_aln.sorted.bam
+
+#PBS -S /bin/bash
+#PBS -N j_s_samtools
+#PBS -q batch
+#PBS -l nodes=1:ppn=1:AMD
+#PBS -l mem=100gb
+#PBS -l walltime=480:00:00
+
+cd $PBS_O_WORKDIR
+
+module load SAMtools/1.6-foss-2016b
+
+time samtools sort /scratch/gwc32007/fastq_alignments/UKP2_aln.bam -o /scratch/gwc32007/fastq_alignments/UKP2_aln.sorted.bam
 
 #marks the duplicate reads in the alignment
 
@@ -22,8 +65,8 @@ samtools sort /lustre1/gwc32007/fastq_alignments/UKP3_aln.bam -o /lustre1/gwc320
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar MarkDuplicates I=/lustre1/gwc32007/fastq_alignments/UKP3_aln.sorted.bam O=/lustre1/gwc32007/fastq_alignments/UKP3_aln.marked_duplicates.bam M=mark
-ed_dup_metrics.txt REMOVE_DUPLICATES=false
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar MarkDuplicates I=/scratch/gwc32007/fastq_alignments/UKP2_aln.sorted.bam O=/scratch/gwc32007/fastq_alignments/UKP2_aln.sorted_duplicates.bam M=marke
+d_dup_metrics.txt REMOVE_DUPLICATES=false
 
 #replaces read groups in the bam file with one read group
 
@@ -37,8 +80,8 @@ ed_dup_metrics.txt REMOVE_DUPLICATES=false
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar AddOrReplaceReadGroups I=/lustre1/gwc32007/fastq_alignments/UKP3_aln.marked_duplicates.bam O=/lustre1/gwc32007/fastq_alignments/UKP3_aln.dupl.read.
-sort.bam SORT_ORDER=coordinate RGLB=lib1 RGPL=illumina RGSM=20 RGPU=unit1 VALIDATION_STRINGENCY=LENIENT
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar AddOrReplaceReadGroups I=/scratch/gwc32007/fastq_alignments/UKP2_aln.sorted_duplicates.bam O=/scratch/gwc32007/fastq_alignments/UKP2_aln.dupl.read.
+sort.bam SORT_ORDER=coordinate RGLB=lib1 RGPL=illumina RGSM=20 RGPU=unit1 VALIDATION_STRINGENCY=LENIENT 
 
 #indexing the reference
 
@@ -53,9 +96,9 @@ cd $PBS_O_WORKDIR
 
 module load SAMtools/1.6-foss-2016b
 
-time samtools faidx /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta
+time samtools faidx /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta
 
-time samtools index /lustre1/gwc32007/fastq_alignments/UKP3_aln.dupl.read.sort.bam
+time samtools index /scratch/gwc32007/fastq_alignments/UKP2_aln.dupl.read.sort.bam
 
 #creating dictionary for reference
 
@@ -70,8 +113,8 @@ module load picard/2.16.0-Java-1.8.0_144
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar CreateSequenceDictionary R=/lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta O=/lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIf
-ullgenome.fasta.dict
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar CreateSequenceDictionary R=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta O=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fa
+sta.dict
 
 #find SNP calls in the alignments
 
@@ -84,5 +127,5 @@ ullgenome.fasta.dict
 
 module load GATK/3.8-0-Java-1.8.0_144
 
-java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /lustre1/gwc32007/crypto_fastq_files/crypto_iowaIIfullgenome.fasta -I /lustre1/gwc32007/fastq_alignments/UKP3_aln.dupl.read.sort.bam -o /lustre1/gwc32007/fastq_alignments/UKP3_output.g.v
-cf.gz -ERC GVCF
+java -Xmx4g -jar /usr/local/apps/eb/GATK/3.8-0-Java-1.8.0_144/GenomeAnalysisTK.jar -T HaplotypeCaller -R /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta -I /scratch/gwc32007/fastq_alignments/UKP2_aln.dupl.read.sort.bam -o /scratch/gwc32007/SNPGenie/gvcf_CURO/UKP2_output.g.vcf.g
+z -ERC GVCF
