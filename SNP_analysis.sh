@@ -113,8 +113,7 @@ module load picard/2.16.0-Java-1.8.0_144
 cd $PBS_O_WORKDIR
 
 module load picard/2.16.0-Java-1.8.0_144
-time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar CreateSequenceDictionary R=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta O=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fa
-sta.dict
+time java -Xmx20g -classpath "/usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144" -jar  /usr/local/apps/eb/picard/2.16.0-Java-1.8.0_144/picard.jar CreateSequenceDictionary R=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta O=/scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.dict
 
 #find SNP calls in the alignments
 
