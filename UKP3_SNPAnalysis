@@ -22,7 +22,7 @@ time bwa index /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta
 cd $PBS_O_WORKDIR
 
 module load BWA/0.7.17-foss-2016b
-time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta /scratch/gwc32007/crypto_fastq/UKP3/SRR6147472_1.fastq /scratch/gwc32007/crypto_fastq/UKP3/SRR6147472_2.fastq.gz > /scratch/gwc32007/fastq_alignments/UKP3_aln.sam
+time bwa mem -M -t 16 /scratch/gwc32007/crypto_genomes/cparvum_iowaII_genome.fasta /scratch/gwc32007/crypto_fastq/UKP3/SRR6147472_1.fastq.gz /scratch/gwc32007/crypto_fastq/UKP3/SRR6147472_2.fastq.gz > /scratch/gwc32007/fastq_alignments/UKP3_aln.sam
 
 #converts the .sam file to a more condensed .bam file
 
